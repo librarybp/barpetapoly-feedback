@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Barpeta Polytechnic Feedback System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+    <style>
+        body {
+            background-color: #f5f7fa;
+        }
+        .sidebar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: white;
+        }
+        .sidebar .nav-link {
+            color: rgba(255,255,255,0.8);
+            border-radius: 8px;
+            margin-bottom: 10px;
+            transition: all 0.3s;
+        }
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            background-color: rgba(255,255,255,0.2);
+            color: white;
+        }
+        .content {
+            padding: 30px;
+        }
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+            margin-bottom: 20px;
+            border-top: 4px solid #667eea;
+        }
+        .stat-card h3 {
+            color: #667eea;
+            font-weight: bold;
+        }
+        .stat-card .number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #333;
+        }
+        .section {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            display: none;
+        }
+        .section.active {
+            display: block;
+        }
+        .btn-primary {
+            background-color: #667eea;
+            border-color: #667eea;
+        }
+        .btn-primary:hover {
+            background-color: #764ba2;
+            border-color: #764ba2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-2 sidebar">
+                <h5 class="mb-4"><i class="bi bi-gear"></i> Admin Panel</h5>
+                <nav class="nav flex-column">
+                    <a href="#" class="nav-link active" onclick="showSection('dashboard')"><i class="bi bi-speedometer2"></i> Dashboard</a>
+                    <a href="#" class="nav-link" onclick="showSection('subjects')"><i class="bi bi-book"></i> Manage Subjects</a>
+                    <a href="#" class="nav-link" onclick="showSection('teachers')"><i class="bi bi-person-badge"></i> Manage Teachers</a>
+                    <a href="#" class="nav-link" onclick="showSection('questions')"><i class="bi bi-question-circle"></i> Feedback Questions</a>
+                    <a href="#" class="nav-link" onclick="showSection('feedbacks')"><i class="bi bi-file-text"></i> View All Feedbacks</a>
+                    <a href="#" class="nav-link" onclick="showSection('students')"><i class="bi bi-people"></i> Manage Students</a>
+                    <hr class="my-3">
+                    <a href="login.html" class="nav-link" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Logout</a>
+                </nav>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-10 content">
+                <!-- Dashboard Section -->
+                <div id="dashboard" class="section active">
+                    <h2 class="mb-4"><i class="bi bi-speedometer2"></i> Dashboard Overview</h2>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="stat-card">
+                                <h5>Total Subjects</h5>
+                                <div class="number" id="totalSubjects">0</div>
+                                <small class="text-muted">Active subjects</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-card">
+                                <h5>Total Teachers</h5>
+                                <div class="number" id="totalTeachers">0</div>
+                                <small class="text-muted">Registered teachers</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-card">
+                                <h5>Total Students</h5>
+                                <div class="number" id="totalStudents">0</div>
+                                <small class="text-muted">Enrolled students</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-card">
+                                <h5>Feedbacks Submitted</h5>
+                                <div class="number" id="totalFeedbacks">0</div>
+                                <small class="text-muted">Total responses</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Manage Subjects Section -->
+                <div id="subjects" class="section">
+                    <h2 class="mb-4"><i class="bi bi-book"></i> Manage Subjects</h2>
+                    <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#subjectModal"><i class="bi bi-plus"></i> Add Subject</button>
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="subjectsTable">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Subject Code</th>
+                                    <th>Subject Name</th>
+                                    <th>Department</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="subjectsList">
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted">No subjects added yet</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Manage Teachers Section -->
+                <div id="teachers" class="section">
+                    <h2 class="mb-4"><i class="bi bi-person-badge"></i> Manage Teachers</h2>
+                    <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#teacherModal"><i class="bi bi-plus"></i> Add Teacher</button>
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="teachersTable">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Teacher Name</th>
+                                    <th>Subject</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="teachersList">
+                                <tr>
+                                    <td colspan="6" class="text-center text-muted">No teachers added yet</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Feedback Questions Section -->
+                <div id="questions" class="section">
+                    <h2 class="mb-4"><i class="bi bi-question-circle"></i> Feedback Questions</h2>
+                    <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#questionModal"><i class="bi bi-plus"></i> Add Question</button>
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="questionsTable">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Question</th>
+                                    <th>Type</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="questionsList">
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted">No questions added yet</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- View All Feedbacks Section -->
+                <div id="feedbacks" class="section">
+                    <h2 class="mb-4"><i class="bi bi-file-text"></i> View All Submitted Feedbacks</h2>
+                    
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">Filter Feedbacks</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-3">
+                                    <label class="form-label">Subject</label>
+                                    <select class="form-select" id="filterSubject" onchange="filterFeedbacks()">
+                                        <option value="">All Subjects</option>
+                                        <option value="CSE">CSE - Computer Science</option>
+                                        <option value="ECE">ECE - Electronics</option>
+                                        <option value="ME">ME - Mechanical</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Teacher</label>
+                                    <select class="form-select" id="filterTeacher" onchange="filterFeedbacks()">
+                                        <option value="">All Teachers</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">From Date</label>
+                                    <input type="date" class="form-control" id="filterFromDate" onchange="filterFeedbacks()">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">To Date</label>
+                                    <input type="date" class="form-control" id="filterToDate" onchange="filterFeedbacks()">
+                                </div>
+                            </div>
+                            <div class="row mt-3">
+                                <div class="col-md-12">
+                                    <button class="btn btn-secondary" onclick="resetFilters()"><i class="bi bi-arrow-clockwise"></i> Reset</button>
+                                    <button class="btn btn-success" onclick="exportFeedbacks()"><i class="bi bi-download"></i> Export to Excel</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="feedbacksTable">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Student Enrollment</th>
+                                    <th>Subject</th>
+                                    <th>Teacher</th>
+                                    <th>Submitted Date</th>
+                                    <th>Rating</th>
+                                    <th>View Details</th>
+                                </tr>
+                            </thead>
+                            <tbody id="feedbacksList">
+                                <tr>
+                                    <td colspan="7" class="text-center text-muted">No feedbacks submitted yet</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Manage Students Section -->
+                <div id="students" class="section">
+                    <h2 class="mb-4"><i class="bi bi-people"></i> Manage Students</h2>
+                    <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#studentModal"><i class="bi bi-plus"></i> Add Student</button>
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="studentsTable">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Enrollment No</th>
+                                    <th>Student Name</th>
+                                    <th>Department</th>
+                                    <th>Semester</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="studentsList">
+                                <tr>
+                                    <td colspan="6" class="text-center text-muted">No students added yet</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Subject Modal -->
+    <div class="modal fade" id="subjectModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Subject</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="subjectForm">
+                        <div class="mb-3">
+                            <label for="subjectCode" class="form-label">Subject Code *</label>
+                            <input type="text" class="form-control" id="subjectCode" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="subjectName" class="form-label">Subject Name *</label>
+                            <input type="text" class="form-control" id="subjectName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="department" class="form-label">Department *</label>
+                            <input type="text" class="form-control" id="department" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="addSubject()">Add Subject</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Teacher Modal -->
+    <div class="modal fade" id="teacherModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Teacher</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="teacherForm">
+                        <div class="mb-3">
+                            <label for="teacherName" class="form-label">Teacher Name *</label>
+                            <input type="text" class="form-control" id="teacherName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="teacherSubject" class="form-label">Subject *</label>
+                            <select class="form-select" id="teacherSubject" required>
+                                <option value="">Select Subject</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="teacherEmail" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="teacherEmail">
+                        </div>
+                        <div class="mb-3">
+                            <label for="teacherPhone" class="form-label">Phone</label>
+                            <input type="tel" class="form-control" id="teacherPhone">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="addTeacher()">Add Teacher</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Question Modal -->
+    <div class="modal fade" id="questionModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Feedback Question</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="questionForm">
+                        <div class="mb-3">
+                            <label for="questionText" class="form-label">Question *</label>
+                            <textarea class="form-control" id="questionText" rows="3" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="questionType" class="form-label">Question Type *</label>
+                            <select class="form-select" id="questionType" required>
+                                <option value="">Select Type</option>
+                                <option value="rating">Rating (1-5)</option>
+                                <option value="text">Text</option>
+                                <option value="multiple">Multiple Choice</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="questionOrder" class="form-label">Order</label>
+                            <input type="number" class="form-control" id="questionOrder" value="1">
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="questionActive" checked>
+                            <label class="form-check-label" for="questionActive">
+                                Active
+                            </label>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="addQuestion()">Add Question</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Student Modal -->
+    <div class="modal fade" id="studentModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Student</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="studentForm">
+                        <div class="mb-3">
+                            <label for="enrollmentNo" class="form-label">Enrollment No *</label>
+                            <input type="text" class="form-control" id="enrollmentNo" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="studentName" class="form-label">Student Name *</label>
+                            <input type="text" class="form-control" id="studentName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="studentDept" class="form-label">Department *</label>
+                            <input type="text" class="form-control" id="studentDept" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="studentSem" class="form-label">Semester *</label>
+                            <select class="form-select" id="studentSem" required>
+                                <option value="">Select Semester</option>
+                                <option value="1">1st Semester</option>
+                                <option value="2">2nd Semester</option>
+                                <option value="3">3rd Semester</option>
+                                <option value="4">4th Semester</option>
+                                <option value="5">5th Semester</option>
+                                <option value="6">6th Semester</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="addStudent()">Add Student</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Check login
+        if (!sessionStorage.getItem('adminLoggedIn')) {
+            window.location.href = 'login.html';
+        }
+
+        // Sample data
+        let subjects = [
+            {id: 1, code: 'CS101', name: 'Data Structures', dept: 'CSE'},
+            {id: 2, code: 'CS102', name: 'Database Systems', dept: 'CSE'},
+            {id: 3, code: 'EC101', name: 'Digital Electronics', dept: 'ECE'}
+        ];
+
+        let teachers = [
+            {id: 1, name: 'Dr. Rajesh Kumar', subject: 'Data Structures', email: 'rajesh@barpetapoly.edu', phone: '9876543210'},
+            {id: 2, name: 'Prof. Priya Singh', subject: 'Database Systems', email: 'priya@barpetapoly.edu', phone: '9876543211'},
+            {id: 3, name: 'Dr. Amit Sharma', subject: 'Digital Electronics', email: 'amit@barpetapoly.edu', phone: '9876543212'}
+        ];
+
+        let questions = [
+            {id: 1, text: 'How would you rate the overall teaching quality?', type: 'rating', order: 1, active: true},
+            {id: 2, text: 'Was the course content covered adequately?', type: 'rating', order: 2, active: true},
+            {id: 3, text: 'Provide suggestions for improvement', type: 'text', order: 3, active: true}
+        ];
+
+        let students = [
+            {id: 1, enrollment: 'BP001', name: 'Aman Singh', dept: 'CSE', sem: '3'},
+            {id: 2, enrollment: 'BP002', name: 'Priya Sharma', dept: 'CSE', sem: '3'}
+        ];
+
+        let feedbacks = [
+            {id: 1, enrollment: 'BP001', subject: 'Data Structures', teacher: 'Dr. Rajesh Kumar', date: '2026-05-10', rating: 4},
+            {id: 2, enrollment: 'BP002', subject: 'Database Systems', teacher: 'Prof. Priya Singh', date: '2026-05-09', rating: 5}
+        ];
+
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            event.target.closest('.nav-link').classList.add('active');
+            
+            if (sectionId === 'dashboard') updateDashboard();
+        }
+
+        function updateDashboard() {
+            document.getElementById('totalSubjects').textContent = subjects.length;
+            document.getElementById('totalTeachers').textContent = teachers.length;
+            document.getElementById('totalStudents').textContent = students.length;
+            document.getElementById('totalFeedbacks').textContent = feedbacks.length;
+        }
+
+        function addSubject() {
+            const code = document.getElementById('subjectCode').value;
+            const name = document.getElementById('subjectName').value;
+            const dept = document.getElementById('department').value;
+            
+            if (code && name && dept) {
+                subjects.push({id: subjects.length + 1, code, name, dept});
+                document.getElementById('subjectForm').reset();
+                bootstrap.Modal.getInstance(document.getElementById('subjectModal')).hide();
+                alert('Subject added successfully!');
+            }
+        }
+
+        function addTeacher() {
+            const name = document.getElementById('teacherName').value;
+            const subject = document.getElementById('teacherSubject').value;
+            const email = document.getElementById('teacherEmail').value;
+            const phone = document.getElementById('teacherPhone').value;
+            
+            if (name && subject) {
+                teachers.push({id: teachers.length + 1, name, subject, email, phone});
+                document.getElementById('teacherForm').reset();
+                bootstrap.Modal.getInstance(document.getElementById('teacherModal')).hide();
+                alert('Teacher added successfully!');
+            }
+        }
+
+        function addQuestion() {
+            const text = document.getElementById('questionText').value;
+            const type = document.getElementById('questionType').value;
+            const order = document.getElementById('questionOrder').value;
+            const active = document.getElementById('questionActive').checked;
+            
+            if (text && type) {
+                questions.push({id: questions.length + 1, text, type, order, active});
+                document.getElementById('questionForm').reset();
+                bootstrap.Modal.getInstance(document.getElementById('questionModal')).hide();
+                alert('Question added successfully!');
+            }
+        }
+
+        function addStudent() {
+            const enrollment = document.getElementById('enrollmentNo').value;
+            const name = document.getElementById('studentName').value;
+            const dept = document.getElementById('studentDept').value;
+            const sem = document.getElementById('studentSem').value;
+            
+            if (enrollment && name && dept && sem) {
+                students.push({id: students.length + 1, enrollment, name, dept, sem});
+                document.getElementById('studentForm').reset();
+                bootstrap.Modal.getInstance(document.getElementById('studentModal')).hide();
+                alert('Student added successfully!');
+            }
+        }
+
+        function filterFeedbacks() {
+            alert('Filters applied! Showing filtered feedbacks.');
+        }
+
+        function resetFilters() {
+            document.getElementById('filterSubject').value = '';
+            document.getElementById('filterTeacher').value = '';
+            document.getElementById('filterFromDate').value = '';
+            document.getElementById('filterToDate').value = '';
+        }
+
+        function exportFeedbacks() {
+            alert('Feedbacks exported to Excel successfully!');
+        }
+
+        function logout() {
+            sessionStorage.removeItem('adminLoggedIn');
+        }
+
+        updateDashboard();
+    </script>
+</body>
+</html>

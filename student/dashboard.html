@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard - Barpeta Polytechnic Feedback System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+    <style>
+        body {
+            background-color: #f5f7fa;
+        }
+        .navbar-custom {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .card-header {
+            border-radius: 10px 10px 0 0 !important;
+            background-color: #f8f9fa;
+            border-bottom: 2px solid #667eea;
+        }
+        .btn-submit {
+            background-color: #667eea;
+            border-color: #667eea;
+            color: white;
+        }
+        .btn-submit:hover {
+            background-color: #764ba2;
+            border-color: #764ba2;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-dark navbar-custom mb-4">
+        <div class="container-fluid">
+            <span class="navbar-brand mb-0 h1">
+                <i class="bi bi-star"></i> Barpeta Polytechnic Feedback System
+            </span>
+            <div>
+                <span class="text-white me-3">Welcome, <strong id="studentName">Student</strong></span>
+                <a href="login.html" class="btn btn-light btn-sm" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Info Cards -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h5 class="card-title">📊 Pending Feedbacks</h5>
+                        <p class="card-text display-6" id="pendingCount">0</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h5 class="card-title">✅ Completed Feedbacks</h5>
+                        <p class="card-text display-6" id="completedCount">0</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h5 class="card-title">📅 Last Submission</h5>
+                        <p class="card-text" id="lastSubmission">Never</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feedback Form -->
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-chat-left-quote"></i> Submit Feedback</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="feedbackForm">
+                            <div class="mb-4">
+                                <label for="subject" class="form-label"><strong>Select Subject *</strong></label>
+                                <select class="form-select form-select-lg" id="subject" onchange="loadTeacher()" required>
+                                    <option value="">-- Choose a Subject --</option>
+                                    <option value="cs101">CS101 - Data Structures</option>
+                                    <option value="cs102">CS102 - Database Systems</option>
+                                    <option value="ec101">EC101 - Digital Electronics</option>
+                                    <option value="me101">ME101 - Mechanics</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-4 p-3 bg-light rounded">
+                                <label for="teacher" class="form-label"><strong>Teacher Name</strong></label>
+                                <div class="alert alert-info" id="teacherInfo">
+                                    <i class="bi bi-info-circle"></i> Please select a subject first
+                                </div>
+                                <div id="teacherDisplay" style="display:none;">
+                                    <div class="badge bg-primary p-2" style="font-size: 14px;">
+                                        <i class="bi bi-person-badge"></i> <span id="teacherName">-</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr>
+                            <h6 class="mb-3"><i class="bi bi-question-circle"></i> Feedback Questions</h6>
+
+                            <div class="mb-4">
+                                <label class="form-label"><strong>1. How would you rate the overall teaching quality?</strong></label>
+                                <div class="d-flex gap-2">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="q1" value="1" id="q1_1">
+                                        <label class="form-check-label" for="q1_1">1 - Poor</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="q1" value="2" id="q1_2">
+                                        <label class="form-check-label" for="q1_2">2 - Fair</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="q1" value="3" id="q1_3">
+                                        <label class="form-check-label" for="q1_3">3 - Good</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="q1" value="4" id="q1_4">
+                                        <label class="form-check-label" for="q1_4">4 - Very Good</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="q1" value="5" id="q1_5">
+                                        <label class="form-check-label" for="q1_5">5 - Excellent</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label"><strong>2. Was the course content covered adequately?</strong></label>
+                                <div class="d-flex gap-2">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="q2" value="1" id="q2_1">
+                                        <label class="form-check-label" for="q2_1">1 - Poor</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="q2" value="2" id="q2_2">
+                                        <label class="form-check-label" for="q2_2">2 - Fair</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="q2" value="3" id="q2_3">
+                                        <label class="form-check-label" for="q2_3">3 - Good</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="q2" value="4" id="q2_4">
+                                        <label class="form-check-label" for="q2_4">4 - Very Good</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="q2" value="5" id="q2_5">
+                                        <label class="form-check-label" for="q2_5">5 - Excellent</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="q3" class="form-label"><strong>3. Provide suggestions for improvement</strong></label>
+                                <textarea class="form-control" id="q3" rows="4" placeholder="Your feedback..." maxlength="500"></textarea>
+                                <small class="text-muted"><span id="charCount">0</span>/500 characters</small>
+                            </div>
+
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-submit btn-lg"><i class="bi bi-check-circle"></i> Submit Feedback</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feedback History -->
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-clock-history"></i> Feedback History</h5>
+                    </div>
+                    <div class="card-body" id="feedbackHistory">
+                        <p class="text-muted text-center">No feedbacks submitted yet</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Check login
+        if (!sessionStorage.getItem('studentLoggedIn')) {
+            window.location.href = 'login.html';
+        }
+
+        // Teacher mapping
+        const teacherMap = {
+            'cs101': 'Dr. Rajesh Kumar',
+            'cs102': 'Prof. Priya Singh',
+            'ec101': 'Dr. Amit Sharma',
+            'me101': 'Prof. Vikram Patel'
+        };
+
+        function loadTeacher() {
+            const subject = document.getElementById('subject').value;
+            const teacherInfo = document.getElementById('teacherInfo');
+            const teacherDisplay = document.getElementById('teacherDisplay');
+            const teacherNameSpan = document.getElementById('teacherName');
+
+            if (subject && teacherMap[subject]) {
+                teacherInfo.style.display = 'none';
+                teacherDisplay.style.display = 'block';
+                teacherNameSpan.textContent = teacherMap[subject];
+            } else {
+                teacherInfo.style.display = 'block';
+                teacherDisplay.style.display = 'none';
+            }
+        }
+
+        // Character counter
+        document.getElementById('q3').addEventListener('input', function() {
+            document.getElementById('charCount').textContent = this.value.length;
+        });
+
+        // Form submission
+        document.getElementById('feedbackForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const subject = document.getElementById('subject').value;
+            const q1 = document.querySelector('input[name="q1"]:checked')?.value;
+            const q2 = document.querySelector('input[name="q2"]:checked')?.value;
+            const q3 = document.getElementById('q3').value;
+
+            if (!subject) {
+                alert('Please select a subject!');
+                return;
+            }
+
+            if (!q1 || !q2) {
+                alert('Please answer all rating questions!');
+                return;
+            }
+
+            alert('Feedback submitted successfully! Thank you for your response.');
+            this.reset();
+            document.getElementById('teacherDisplay').style.display = 'none';
+            document.getElementById('teacherInfo').style.display = 'block';
+        });
+
+        function logout() {
+            sessionStorage.removeItem('studentLoggedIn');
+        }
+    </script>
+</body>
+</html>
